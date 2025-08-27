@@ -1,0 +1,12 @@
+brew "docker", link: false
+brew "dotnet@8"
+brew "git"
+brew "lazygit"
+brew "nvm"
+brew "tmux"
+cask "docker-desktop"
+cask "element"
+cask "obs"
+cask "openvpn-connect"
+cask "telegram"
+cask "visual-studio-code"
