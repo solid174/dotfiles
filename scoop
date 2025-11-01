@@ -1,0 +1,215 @@
+{
+    "config": {
+        "scoop_repo": "https://github.com/ScoopInstaller/Scoop",
+        "scoop_branch": "master"
+    },
+    "apps": [
+        {
+            "Info": "",
+            "Source": "main",
+            "Name": "7zip",
+            "Version": "25.01",
+            "Updated": "\/Date(1756837382160)\/"
+        },
+        {
+            "Info": "",
+            "Source": "main",
+            "Name": "7zip19.00-helper",
+            "Version": "19.00",
+            "Updated": "\/Date(1753615958023)\/"
+        },
+        {
+            "Info": "",
+            "Source": "main",
+            "Name": "ast-grep",
+            "Version": "0.39.6",
+            "Updated": "\/Date(1760719598603)\/"
+        },
+        {
+            "Info": "",
+            "Source": "extras",
+            "Name": "ayugram",
+            "Version": "5.16.4",
+            "Updated": "\/Date(1756831921984)\/"
+        },
+        {
+            "Info": "",
+            "Source": "extras",
+            "Name": "copyq",
+            "Version": "12.0.1",
+            "Updated": "\/Date(1760945300584)\/"
+        },
+        {
+            "Info": "",
+            "Source": "main",
+            "Name": "dark",
+            "Version": "3.14.1",
+            "Updated": "\/Date(1760809397045)\/"
+        },
+        {
+            "Info": "",
+            "Source": "main",
+            "Name": "fd",
+            "Version": "10.2.0",
+            "Updated": "\/Date(1753392247448)\/"
+        },
+        {
+            "Info": "",
+            "Source": "main",
+            "Name": "fzf",
+            "Version": "0.65.1",
+            "Updated": "\/Date(1754470428894)\/"
+        },
+        {
+            "Info": "",
+            "Source": "main",
+            "Name": "innounp",
+            "Version": "2.65.2",
+            "Updated": "\/Date(1760719561701)\/"
+        },
+        {
+            "Info": "",
+            "Source": "nerd-fonts",
+            "Name": "JetBrainsMono-NF",
+            "Version": "3.4.0",
+            "Updated": "\/Date(1753825328827)\/"
+        },
+        {
+            "Info": "",
+            "Source": "extras",
+            "Name": "kdeconnect",
+            "Version": "25.04-5109",
+            "Updated": "\/Date(1760944062378)\/"
+        },
+        {
+            "Info": "",
+            "Source": "extras",
+            "Name": "keyviz",
+            "Version": "1.0.6",
+            "Updated": "\/Date(1760719565080)\/"
+        },
+        {
+            "Info": "",
+            "Source": "extras",
+            "Name": "lazygit",
+            "Version": "0.55.1",
+            "Updated": "\/Date(1760719607487)\/"
+        },
+        {
+            "Info": "",
+            "Source": "main",
+            "Name": "neovim",
+            "Version": "0.11.3",
+            "Updated": "\/Date(1753391025824)\/"
+        },
+        {
+            "Info": "",
+            "Source": "main",
+            "Name": "nvm",
+            "Version": "1.2.2",
+            "Updated": "\/Date(1756838347360)\/"
+        },
+        {
+            "Info": "",
+            "Source": "extras",
+            "Name": "obs-studio",
+            "Version": "32.0.1",
+            "Updated": "\/Date(1760719665290)\/"
+        },
+        {
+            "Info": "Install failed",
+            "Source": null,
+            "Name": "openrgb",
+            "Version": null,
+            "Updated": "\/Date(1760941401467)\/"
+        },
+        {
+            "Info": "",
+            "Source": "main",
+            "Name": "postgresql",
+            "Version": "17.4",
+            "Updated": "\/Date(1753616023443)\/"
+        },
+        {
+            "Info": "",
+            "Source": "extras",
+            "Name": "postman",
+            "Version": "11.67.5",
+            "Updated": "\/Date(1760719629058)\/"
+        },
+        {
+            "Info": "",
+            "Source": "main",
+            "Name": "psqlodbc",
+            "Version": "17.00.0006",
+            "Updated": "\/Date(1753615868103)\/"
+        },
+        {
+            "Info": "",
+            "Source": "main",
+            "Name": "pyenv",
+            "Version": "3.1.1",
+            "Updated": "\/Date(1756837136202)\/"
+        },
+        {
+            "Info": "",
+            "Source": "extras",
+            "Name": "qbittorrent",
+            "Version": "5.1.2",
+            "Updated": "\/Date(1756837439069)\/"
+        },
+        {
+            "Info": "",
+            "Source": "main",
+            "Name": "ripgrep",
+            "Version": "14.1.1",
+            "Updated": "\/Date(1753538200363)\/"
+        },
+        {
+            "Info": "",
+            "Source": "extras",
+            "Name": "rustdesk",
+            "Version": "1.4.3",
+            "Updated": "\/Date(1760958261096)\/"
+        },
+        {
+            "Info": "",
+            "Source": "main",
+            "Name": "zig",
+            "Version": "0.14.1",
+            "Updated": "\/Date(1753391095323)\/"
+        }
+    ],
+    "buckets": [
+        {
+            "Name": "main",
+            "Source": "https://github.com/ScoopInstaller/Main.git",
+            "Updated": {
+                "value": "\/Date(1761481926000)\/",
+                "DisplayHint": 2,
+                "DateTime": "October 26, 2025 17:32:06"
+            },
+            "Manifests": 1407
+        },
+        {
+            "Name": "extras",
+            "Source": "https://github.com/ScoopInstaller/Extras",
+            "Updated": {
+                "value": "\/Date(1761481948000)\/",
+                "DisplayHint": 2,
+                "DateTime": "October 26, 2025 17:32:28"
+            },
+            "Manifests": 2206
+        },
+        {
+            "Name": "nerd-fonts",
+            "Source": "https://github.com/matthewjberger/scoop-nerd-fonts",
+            "Updated": {
+                "value": "\/Date(1761122086000)\/",
+                "DisplayHint": 2,
+                "DateTime": "October 22, 2025 13:34:46"
+            },
+            "Manifests": 367
+        }
+    ]
+}
