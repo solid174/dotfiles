@@ -1,0 +1,18 @@
+asyncapi-preview
+Container Tools
+CSV to Table
+Dev Containers
+Docker
+Docker DX
+ESLint
+IntelliCode API Usage Examples
+markdownlint
+Mermaid Preview
+PlantUML
+PlantUML Grammar
+PlantUML Syntax
+PowerShell
+readme-preview
+SonarQube for IDE
+Vitest
+vscode-proto3
