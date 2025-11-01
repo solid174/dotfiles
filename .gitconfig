@@ -1,0 +1,35 @@
+[core]
+	ignorecase = false
+
+[user]
+	name = No Name
+	email = none@local.invalid
+
+[format]
+	pretty = "%C(yellow)%h %C(dim green)%cd %C(reset)| %C(#ff8c1a)%d %C(cyan)%s %C(#667788)[%an]"
+[log]
+	date = format-local:'%F %H:%M'
+	decorate = short
+	abbrevCommit = true
+	showSignature = false
+
+[pull]
+	rebase = true
+
+[push]
+	autoSetupRemote = true
+
+[init]
+	defaultBranch = main
+
+# Windows
+[includeIf "gitdir/i:D:/src/hobby/"]
+	path = D:/src/hobby/.gitconfig
+[includeIf "gitdir/i:D:/src/work/"]
+	path = D:/src/work/.gitconfig
+
+# macOS / Linux
+[includeIf "gitdir:~/coding/src/hobby/"]
+	path = ~/coding/src/hobby/.gitconfig
+[includeIf "gitdir:~/coding/src/work/"]
+	path = ~/coding/src/work/.gitconfig
