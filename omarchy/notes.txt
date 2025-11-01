@@ -1,0 +1,20 @@
+~/.config/hypr/hypridle.conf:
+- Увеличить время работы
+- Переключить раскладку перед блокировкой: on-timeout = hyprctl switchxkblayout all 0 || loginctl lock-session 
+
+~/.config/hypr/input.conf:
+- В начале блока "input":
+  kb_layout = us, ru
+  kb_options = compose:caps # ,grp:shifts_toggle
+- Снизить сенсу до -15 и убрать numlock
+- В конец бинды для клавиатуры:
+  # Custom keyboard layout switching
+  bind = LSHIFT LCTRL, 1, exec, hyprctl switchxkblayout all 0
+  bind = LSHIFT LCTRL, 2, exec, hyprctl switchxkblayout all 1
+
+~/.config/hypr/monitors.conf:
+- Только это:
+  # Straight 1x setup for low-resolution displays like 1080p or 1440p
+  env = GDK_SCALE,1
+  monitor=DP-3,2560x1440@165,0x0,1
+  monitor=DP-2,2560x1440@165,2560x0,1
