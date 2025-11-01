@@ -1,8 +1,36 @@
 {
-    "config": {
-        "scoop_repo": "https://github.com/ScoopInstaller/Scoop",
-        "scoop_branch": "master"
-    },
+    "buckets": [
+        {
+            "Name": "main",
+            "Source": "https://github.com/ScoopInstaller/Main.git",
+            "Updated": {
+                "value": "\/Date(1761698429000)\/",
+                "DisplayHint": 2,
+                "DateTime": "October 29, 2025 5:40:29"
+            },
+            "Manifests": 1407
+        },
+        {
+            "Name": "extras",
+            "Source": "https://github.com/ScoopInstaller/Extras",
+            "Updated": {
+                "value": "\/Date(1761698487000)\/",
+                "DisplayHint": 2,
+                "DateTime": "October 29, 2025 5:41:27"
+            },
+            "Manifests": 2206
+        },
+        {
+            "Name": "nerd-fonts",
+            "Source": "https://github.com/matthewjberger/scoop-nerd-fonts",
+            "Updated": {
+                "value": "\/Date(1761672198000)\/",
+                "DisplayHint": 2,
+                "DateTime": "October 28, 2025 22:23:18"
+            },
+            "Manifests": 367
+        }
+    ],
     "apps": [
         {
             "Info": "",
@@ -168,6 +196,13 @@
         {
             "Info": "",
             "Source": "extras",
+            "Name": "rufus",
+            "Version": "4.11",
+            "Updated": "\/Date(1761700585161)\/"
+        },
+        {
+            "Info": "",
+            "Source": "extras",
             "Name": "rustdesk",
             "Version": "1.4.3",
             "Updated": "\/Date(1760958261096)\/"
@@ -178,38 +213,6 @@
             "Name": "zig",
             "Version": "0.14.1",
             "Updated": "\/Date(1753391095323)\/"
-        }
-    ],
-    "buckets": [
-        {
-            "Name": "main",
-            "Source": "https://github.com/ScoopInstaller/Main.git",
-            "Updated": {
-                "value": "\/Date(1761481926000)\/",
-                "DisplayHint": 2,
-                "DateTime": "October 26, 2025 17:32:06"
-            },
-            "Manifests": 1407
-        },
-        {
-            "Name": "extras",
-            "Source": "https://github.com/ScoopInstaller/Extras",
-            "Updated": {
-                "value": "\/Date(1761481948000)\/",
-                "DisplayHint": 2,
-                "DateTime": "October 26, 2025 17:32:28"
-            },
-            "Manifests": 2206
-        },
-        {
-            "Name": "nerd-fonts",
-            "Source": "https://github.com/matthewjberger/scoop-nerd-fonts",
-            "Updated": {
-                "value": "\/Date(1761122086000)\/",
-                "DisplayHint": 2,
-                "DateTime": "October 22, 2025 13:34:46"
-            },
-            "Manifests": 367
         }
     ]
 }
