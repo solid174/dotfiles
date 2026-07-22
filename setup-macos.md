@@ -22,7 +22,7 @@ destructive; everything else — just do it.
 Install Homebrew, then:
 
 **Formulae:**
-`atuin bat btop direnv docker docker-completion eza fastfetch fd fzf fzf-tab gh git-delta jq lazydocker lazygit neovim nvm opencode ripgrep shfmt starship stylua tailscale tree-sitter-cli uv vivid zoxide zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting`
+`atuin bat btop direnv docker docker-completion eza fastfetch fd fzf fzf-tab gh git-delta jq lazydocker lazygit neovim nvm opencode ripgrep shfmt starship stylua superfile tailscale tree-sitter-cli uv vivid zoxide zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting`
 
 Tap + install: `valkyrie00/bbrew/bbrew` (TUI for brew itself).
 
@@ -64,7 +64,16 @@ Build it with these blocks, in this order:
    jumps, alt-backspace kill word.
 7. **Aliases**: `ll`/`la` = eza long with icons/git/group-dirs-first, `ls` = eza,
    `cat`=bat, `grep`=rg, `lg`=lazygit, `ld`=lazydocker, `tree`=`eza --tree --icons=auto`,
-   `..`/`...`.
+   `..`/`...`. Plus a `spf` **function** (not an alias) so superfile can cd-on-quit:
+   ```zsh
+   spf() {
+     command spf "$@"
+     local f="$HOME/Library/Application Support/superfile/lastdir"
+     [ -r "$f" ] && source "$f"
+   }
+   ```
+   superfile writes a `cd '/path'` line to that lastdir file on quit; source it (never
+   capture with `$(...)` — the TUI escape sequences would garble the screen).
 8. **Project jumps**: `cdpath` covering my source roots (ask me for the layout — pattern
    is `~/coding/src/work/...` and `~/coding/src/hobby/...`), plus one-word shell
    functions for the repos I'm currently living in.
@@ -107,10 +116,14 @@ See .gitconfig file for details.
 
 ## 4. Ghostty (`~/.config/ghostty/config`)
 
-JetBrainsMono Nerd Font Mono 14pt, theme Catppuccin Mocha, padding 10/8, opacity 0.96 +
-blur 20 + `background-opacity-cells`, `macos-option-as-alt`, `copy-on-select=clipboard`,
-no close confirmation, `window-save-state=always`, `mouse-hide-while-typing`.
-Quick terminal: F12 global toggle, top, fullscreen, autohide, follows spaces.
+JetBrainsMono Nerd Font Mono 14pt, theme Catppuccin Mocha, padding-x 15 / padding-y 12.
+Transparency is a deliberate part of the vibe: `background-opacity = 0.85`,
+`background-blur = 2`, `background-opacity-cells = true`, and `unfocused-split-opacity =
+0.94` so the inactive split dims. Plus `macos-option-as-alt`, `copy-on-select=clipboard`,
+no close confirmation (`confirm-close-surface=false`), `window-save-state=always`,
+`mouse-hide-while-typing`.
+Quick terminal: F12 global toggle, `position=top`, `size=100%,100%`, `screen=main`,
+`animation-duration=0.18`, `autohide=true`, `space-behavior=move`.
 Keybinds: cmd-t/w tabs, cmd-d / cmd-shift-d splits, cmd-arrows split navigation,
 cmd-shift-left/right tabs, cmd-shift-enter zoom split, cmd-shift-e equalize.
 Validate with `ghostty +validate-config`.
@@ -133,14 +146,31 @@ cmd_duration → newline → character. Directory bold cyan, truncation 4, full 
 Git branch `git:` prefix bold purple; status bold yellow. `.NET ` / `node ` version
 segments. cmd_duration only above 1.5s. Prompt char `>` green/red.
 
-## 7. Neovim
+## 7. superfile (`~/Library/Application Support/superfile/`)
+
+My file manager (`spf`). Install `brew install superfile`; config lives in
+`config.toml` + `hotkeys.toml` under that dir. Key settings:
+`theme = "catppuccin-mocha"`, `nerdfont = true` + `show_select_icons = true`,
+`code_previewer = "bat"` (bat, not the builtin chroma), `cd_on_quit = true` (paired with
+the `spf` shell function from §2.7), `zoxide_support = true`,
+`transparent_background = true` (matches the Ghostty opacity). File previews on
+(`default_open_file_preview`, `show_image_preview`, `show_panel_footer_info`),
+`default_sort_type = 4` (natural), `file_panel_extra_columns = 2`, sidebar with
+`home / pinned / disks`. Hotkeys are left at defaults.
+
+## 8. Neovim
 
 Clone the LazyVim starter into `~/.config/nvim`, remove its `.git`, run headless plugin
-sync. Stock starter is fine — I customize in-repo per machine.
+sync. On top of the starter I keep a transparent background (`lua/plugins/transparent.lua`
+— tokyonight `transparent = true`, transparent sidebars/floats) so the Ghostty
+opacity/blur shows through; the rest I customize in-repo per machine.
 
-## 8. Verification
+## 9. Verification
 
-- new Ghostty window: font/theme/opacity right, F12 quick terminal works
+- new Ghostty window: font/theme right, background is translucent+blurred (opacity 0.85),
+  F12 quick terminal works
+- `spf` launches: Catppuccin theme, Nerd Font icons, bat file previews, translucent
+  background; navigate somewhere and quit with `Q` — the shell cd's to that dir
 - `time zsh -i -c exit` < 0.5s, no compinit warnings
 - tab completion shows fzf-tab with previews; ctrl-r opens atuin; ctrl-t previews files
 - `lg` in any repo: diff is single-column with line numbers; `git diff` in a wide

@@ -8,10 +8,10 @@ each block. Ask before anything destructive.
 
 ## Vibe
 
-- **Catppuccin Mocha** everywhere: terminal scheme, bat, delta, fzf, lazygit, yazi.
+- **Catppuccin Mocha** everywhere: terminal scheme, bat, delta, fzf, lazygit, superfile.
 - **JetBrainsMono Nerd Font** in the terminal.
-- Preference order: **good TUI > GUI > bare CLI** — lazygit, btop-equivalent, yazi,
-  one-letter aliases.
+- Preference order: **good TUI > GUI > bare CLI** — lazygit, btop-equivalent, superfile
+  (`spf`), one-letter aliases.
 - **fzf with previews** wired into the shell.
 - Minimal fast starship prompt. Secrets in an untracked local profile file, never in
   the main profile.
@@ -23,7 +23,7 @@ each block. Ask before anything destructive.
 Install scoop, add buckets: `main extras nerd-fonts`.
 
 Core: `pwsh git gh lazygit delta bat eza fd ripgrep fzf zoxide jq neovim starship
-bottom btop4win fnm uv shfmt stylua dotnet-sdk wezterm`
+bottom btop4win fnm uv shfmt stylua dotnet-sdk wezterm superfile`
 (bottom/btop4win — pick whichever works better as the btop equivalent; fnm replaces nvm;
 `pwsh` must be the **latest** PowerShell, not the built-in Windows PowerShell 5).
 
@@ -36,7 +36,8 @@ Tailscale. Docker: Docker Desktop or WSL2 engine — ask me which this machine n
 ## 2. Terminal: WezTerm
 
 WezTerm as the terminal (`~/.wezterm.lua`): Catppuccin Mocha color scheme,
-JetBrainsMono Nerd Font 14, light window padding, background opacity ~0.96, latest
+JetBrainsMono Nerd Font 14, light window padding, background opacity ~0.85 (deliberate
+translucency, like my Mac — lets nvim/superfile transparent backgrounds show through), latest
 pwsh as the default program, tab bar tidy (no fancy plugins needed), keybinds:
 ctrl+shift+t/w tabs, ctrl+shift+d / ctrl+shift+alt+d splits, ctrl+shift+arrows pane
 navigation, a zoom-pane toggle.
@@ -63,23 +64,22 @@ modules — this shell should feel as complete as a tuned zsh:
 
 If you find other well-maintained pwsh add-ons that fit the vibe, propose them.
 
-## 4. yazi — file manager, full setup (the fun part)
+## 4. superfile — file manager
 
-This is the Windows-specific addition — set it up properly, not bare-bones:
+Same file manager as my Mac/Linux (`spf`), so keep the config identical to those machines:
 
-- `scoop install yazi` + preview/runtime deps: `ffmpeg 7zip jq poppler fd ripgrep fzf
-  zoxide imagemagick`, and the `file` package (yazi needs it on Windows; set
-  `YAZI_FILE_ONE` if it doesn't find it).
-- **Flavor**: `ya pkg add yazi-rs/flavors:catppuccin-mocha`, set in `theme.toml`.
-- **Plugins** via `ya pkg add`: `yazi-rs/plugins:full-border`,
-  `yazi-rs/plugins:git` (status signs in the file list — wire the fetcher in yazi.toml),
-  `yazi-rs/plugins:smart-enter` (enter = open file or descend dir),
-  plus anything currently trending that fits (check yazi-rs/plugins README) — surprise me,
-  but explain what each one does.
-- **Shell integration**: `y` function in $PROFILE (the documented cwd-file wrapper) so
-  quitting yazi cd's the shell to where I navigated.
-- Keymap: keep defaults, make sure fzf/zoxide jump bindings (`z`, `Z`) work.
-- Editor opens in nvim.
+- `scoop install superfile` (or `winget install --id yorukot.superfile`). Preview/runtime
+  deps that make it shine: `bat fd ripgrep fzf zoxide` (already in §1).
+- Config lives in `%LOCALAPPDATA%\superfile\` (`config.toml` + `hotkeys.toml`). Key
+  settings: `theme = "catppuccin-mocha"`, `nerdfont = true` + `show_select_icons`,
+  `code_previewer = "bat"`, `zoxide_support = true`, `transparent_background = true`
+  (matches the WezTerm opacity), previews on, `default_sort_type = 4` (natural),
+  `file_panel_extra_columns = 2`, sidebar `home/pinned/disks`. Hotkeys stay default.
+- **Shell integration** (`cd_on_quit = true`): a `spf` function in $PROFILE so quitting
+  with `Q` cd's the shell to the last dir — run `spf` (the binary), then read the
+  `cd`-line superfile writes to its `lastdir` file under `%LOCALAPPDATA%\superfile\` and
+  `Set-Location` to it. Don't capture stdout — TUI escapes would garble the screen.
+- Editor opens in nvim (`editor` inherits `$EDITOR`).
 
 ## 5. git
 
@@ -128,8 +128,8 @@ eza/bat/fd/rg/delta/lazygit, Catppuccin Mocha).
   symbols, lazygit borders); tab/split/zoom keybinds work
 - ctrl-r fuzzy history, ctrl-t file picker with preview
 - `lg` in a repo: single-column delta diff; `git diff` in a wide window: side-by-side
-- `y` → navigate somewhere → quit → shell followed the cd; previews work for images,
-  pdf, archives, video thumbnails; git signs visible in a repo
+- `spf` → navigate somewhere → quit with `Q` → shell followed the cd; Catppuccin theme,
+  Nerd Font icons, and bat file previews render
 - `git config user.email` inside work/hobby roots returns the right identity, elsewhere
   the placeholder
 - `dotnet --list-sdks`, `node -v` (via fnm), `nvim` opens with LazyVim dashboard

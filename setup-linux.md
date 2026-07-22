@@ -29,7 +29,10 @@ Install (names vary per distro — e.g. `bat`→`batcat`, `fd`→`fd-find` on De
 with aliases or symlinks so canonical names work):
 
 `zsh git gh neovim lazygit lazydocker btop atuin bat eza fd ripgrep fzf zoxide jq
-git-delta starship vivid direnv fastfetch uv tree-sitter-cli shfmt stylua`
+git-delta starship vivid direnv fastfetch uv tree-sitter-cli shfmt stylua superfile`
+
+(`superfile` may be stale/absent in distro repos — prefer Homebrew-on-Linux
+`brew install superfile` or the official install script if so.)
 
 plus zsh plugins: `zsh-autosuggestions zsh-syntax-highlighting zsh-completions fzf-tab`
 (package or git-clone, whatever the distro supports cleanly).
@@ -66,14 +69,26 @@ features. See .gitconfig file for details.
 **starship**: add_newline=false; directory → git → dotnet → nodejs → cmd_duration
 (>1.5s) → `>` prompt char green/red.
 
+**superfile** (`~/.config/superfile/config.toml` + `hotkeys.toml`): my file manager
+(`spf`). `theme = "catppuccin-mocha"`, `nerdfont = true` + `show_select_icons`,
+`code_previewer = "bat"`, `cd_on_quit = true`, `zoxide_support = true`,
+`transparent_background = true`, previews on, `default_sort_type = 4` (natural),
+`file_panel_extra_columns = 2`, sidebar `home/pinned/disks`. cd_on_quit needs a `spf`
+shell function: run `command spf`, then `source ~/.config/superfile/lastdir` (never via
+`$(...)` — TUI escapes would garble the screen); superfile writes a `cd '/path'` line
+there on quit. Hotkeys stay default.
+
 **nvim**: LazyVim starter clone, `.git` removed, headless sync. Ensure a C compiler
-exists for treesitter.
+exists for treesitter. Keep a transparent background (tokyonight `transparent = true`,
+transparent sidebars/floats) so the terminal opacity/blur shows through.
 
 ## 4. Desktop only (skip on headless)
 
 - Terminal: Ghostty if packaged for the distro, otherwise WezTerm/kitty — Mocha theme,
-  JetBrainsMono Nerd Font 14, light padding, slight transparency (~0.96), keybinds:
-  new tab / close, split right + down, arrows to navigate panes, zoom-pane toggle.
+  JetBrainsMono Nerd Font 14, light padding. Transparency is deliberate: background
+  opacity ~0.85 + a little blur (like my Mac), so nvim/superfile transparent backgrounds
+  show through. Keybinds: new tab / close, split right + down, arrows to navigate panes,
+  zoom-pane toggle.
 - Browser, Claude + Claude Code, VS Code / Rider as needed — ask what this machine is for.
 - Docker: engine + compose plugin (no Docker Desktop), user in docker group.
 - Tailscale via official script if this machine should join the tailnet — ask.
@@ -84,5 +99,6 @@ exists for treesitter.
 - tab completion = fzf-tab with previews; ctrl-r = atuin; icons render (desktop)
 - `lg` diff single-column; `git diff` side-by-side in a wide terminal
 - identity: work/hobby repos resolve real emails, elsewhere placeholder
+- `spf` launches with Catppuccin theme + icons + previews; quit with `Q` cd's the shell
 - `btop`, `fastfetch` run; `node -v`, `dotnet --list-sdks` (if installed) resolve
 - headless: everything above minus GUI still holds over ssh
