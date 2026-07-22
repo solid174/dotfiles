@@ -1,5 +1,7 @@
 [core]
 	ignorecase = false
+	pager = delta
+	autocrlf = input
 
 [user]
 	name = No Name
@@ -22,6 +24,34 @@
 [init]
 	defaultBranch = main
 
+[interactive]
+	diffFilter = delta --color-only
+
+[delta]
+	navigate = true
+	line-numbers = true
+	syntax-theme = Catppuccin Mocha
+	# side-by-side lives in a feature so lazygit can opt out (--features=lazygit)
+	features = wide-view
+
+[delta "wide-view"]
+	side-by-side = true
+
+[merge]
+	conflictStyle = zdiff3
+
+[diff]
+	colorMoved = default
+
+[alias]
+	st = status -sb
+	co = checkout
+	sw = switch
+	br = branch
+	cm = commit
+	amend = commit --amend --no-edit
+	lg = log --graph --decorate --oneline --all
+
 # Windows
 [includeIf "gitdir/i:D:/src/hobby/"]
 	path = D:/src/hobby/.gitconfig
@@ -33,3 +63,7 @@
 	path = ~/coding/src/hobby/.gitconfig
 [includeIf "gitdir:~/coding/src/work/"]
 	path = ~/coding/src/work/.gitconfig
+
+# narrow panes in lazygit: feature overrides side-by-side from [delta]
+[delta "lazygit"]
+	side-by-side = false
