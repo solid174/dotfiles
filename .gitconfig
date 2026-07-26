@@ -24,6 +24,16 @@
 [init]
 	defaultBranch = main
 
+# rebase-heavy workflow: remember resolved conflicts and replay them automatically
+# when the same branch gets rebased again
+[rerere]
+	enabled = true
+	autoupdate = true
+
+[fetch]
+	prune = true          # drop local refs for branches deleted on the remote
+	pruneTags = true
+
 [interactive]
 	diffFilter = delta --color-only
 
@@ -42,6 +52,15 @@
 
 [diff]
 	colorMoved = default
+	algorithm = histogram   # markedly saner than the default myers on refactors
+
+# freshest branches first, tags by version, multi-column output across terminal width
+[branch]
+	sort = -committerdate
+[tag]
+	sort = -version:refname
+[column]
+	ui = auto
 
 [alias]
 	st = status -sb

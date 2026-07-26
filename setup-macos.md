@@ -15,32 +15,88 @@ destructive; everything else — just do it.
   (`time zsh -i -c exit`) — if a step slows it down, find a lazier way.
 - Secrets never live in tracked files — `~/.zshrc.local` (chmod 600), sourced if present.
 - No version pins in this doc: always install current stable. If a tool needs a specific
-  version for a project, that's the project's concern (global.json, .nvmrc), not this setup.
+  version for a project, that's the project's concern (global.json, mise.toml), not this setup.
+- Runtimes are **mise**'s job, never the package manager's (see §1b).
+- IDE settings are not tracked here — this repo holds shell/CLI/TUI config only; editors
+  sync their own settings through their own accounts.
+- Secrets and local-only wrappers stay out of this repo; document the *shape*, not the
+  contents.
 
 ## 1. Homebrew + packages
 
 Install Homebrew, then:
 
 **Formulae:**
-`atuin bat btop direnv docker docker-completion eza fastfetch fd fzf fzf-tab gh git-delta jq lazydocker lazygit neovim nvm opencode ripgrep shfmt starship stylua superfile tailscale tree-sitter-cli uv vivid zoxide zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting`
+`atuin bat btop coreutils docker docker-completion eza fastfetch fd fzf fzf-tab gh git-delta jq lazydocker lazygit mise neovim opencode ripgrep shfmt starship stylua superfile tailscale tree-sitter-cli uv vivid zoxide zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting`
+
+`coreutils` is here only for `timeout`, which macOS does not ship — agent sessions use it
+to bound long test runs. Commands macOS already provides keep the `g` prefix; the GNU
+`gnubin` directory is deliberately **not** on `PATH`, so `ls`/`date`/`sed` stay BSD.
 
 Tap + install: `valkyrie00/bbrew/bbrew` (TUI for brew itself).
 
 **Casks:**
-`anydesk audiorelay blackhole-2ch blackhole-16ch claude claude-code codex cyberduck dotnet-sdk font-jetbrains-mono-nerd-font ghostty google-chrome lm-studio logi-options+ middleclick obs openvpn-connect orbstack pearcleaner rider t3-code transmission visual-studio-code`
+`anydesk audiorelay blackhole-2ch blackhole-16ch claude claude-code codex cyberduck font-jetbrains-mono-nerd-font ghostty google-chrome lm-studio logi-options+ middleclick obs openvpn-connect orbstack pearcleaner t3-code transmission visual-studio-code`
 
 Notes:
 - `orbstack` replaces Docker Desktop; the `docker` formula is just the CLI client.
-- `dotnet-sdk` = current SDK; add LTS cask alongside only if a project demands it.
+- Language runtimes (node, go, rust, dotnet) are **not** brew formulae — `mise` owns them
+  (see §1b). No `dotnet-sdk` cask: the standard lookup path `/usr/local/share/dotnet` is a
+  symlink to mise's dotnet-root, so anything that probes that path (IDEs, editor
+  extensions) sees the same SDKs as the CLI —
+  `sudo ln -s ~/.local/share/mise/dotnet-root /usr/local/share/dotnet`.
+- Python is not a brew formula either — `uv` provides the system `python3`
+  (`uv python install <ver> --default`; shims land in `~/.local/bin`, which is on PATH).
 - After install run `chmod g-w /opt/homebrew/share` — otherwise zsh compaudit complains
   and full compinit aborts.
+
+## 1b. mise (runtime version manager)
+
+`mise` replaces nvm (node), the ad-hoc brew go/rust/dotnet installs, and direnv (dir-local
+env). One binary, per-project version switching on `cd`, honours in-repo `global.json` /
+`mise.toml`. Install is the `mise` formula (above); activation lives in the zsh tool-inits
+block (§2.9).
+
+Write `~/.config/mise/config.toml` — global defaults are current-stable **only**, no
+project pins (a project pins its own via `global.json` / `mise.toml`):
+
+```toml
+[tools]
+node = "24"
+go   = "1.26"
+rust = "stable"          # installed via rustup under the hood; CARGO_HOME=~/.cargo
+# Both .NET SDKs share one dotnet-root, so the single `dotnet` muxer resolves each
+# repo's global.json natively: 10 is the default, work repos pinning 8.0.11x roll
+# forward to 8.0.129. Do NOT enable idiomatic global.json — mise would read the pin
+# literally, not find it as a mise install, and drop dotnet from PATH.
+dotnet = ["10", "8.0.129"]
+
+[env]
+EDITOR = "nvim"
+VISUAL = "nvim"
+PAGER = "less"
+LESS = "-FRX"
+DOTNET_CLI_TELEMETRY_OPTOUT = "1"
+```
+
+Then `mise install`. Python is deliberately absent — uv owns it: `uv python install 3.14
+--default` creates `python` / `python3` shims in `~/.local/bin` (that dir is prepended to
+PATH in §2.1's env block).
+
+Plain global env vars (no PATH surgery, no shell-load-order dependency) live in this
+`[env]` block, not `~/.zshrc` — `mise activate zsh` exports them on every shell.
+Directory-scoped env (e.g. a work API endpoint that should only apply under one source
+tree) goes in a `mise.toml` dropped at the root of that tree instead — e.g.
+`~/coding/src/work/<org>/mise.toml` holds `LITELLM_BASE_URL`, picked up on `cd` into any
+repo under that tree, not machine-wide.
 
 ## 2. zsh (`~/.zshrc`)
 
 Build it with these blocks, in this order:
 
-1. **Env**: `EDITOR`/`VISUAL`=nvim, `PAGER`=less, `LESS="-FRX"`,
-   `DOTNET_CLI_TELEMETRY_OPTOUT=1`, `PATH+=~/.dotnet/tools`.
+1. **Env**: `PATH+=~/.dotnet/tools`, and `PATH="$HOME/.local/bin:$PATH"` (holds uv's
+   default python3 shims). Plain (non-PATH) env vars — `EDITOR`, `DOTNET_CLI_TELEMETRY_OPTOUT`,
+   etc. — live in mise's `[env]` block instead (§1b), not here.
 2. **Colors + fzf**: `LS_COLORS="$(vivid generate catppuccin-mocha)"`,
    `BAT_THEME="Catppuccin Mocha"`. fzf default command = `fd --hidden --strip-cwd-prefix
    --exclude .git`; alt-c = dirs only. `FZF_DEFAULT_OPTS`: height 60%, reverse, border,
@@ -64,7 +120,8 @@ Build it with these blocks, in this order:
    jumps, alt-backspace kill word.
 7. **Aliases**: `ll`/`la` = eza long with icons/git/group-dirs-first, `ls` = eza,
    `cat`=bat, `grep`=rg, `lg`=lazygit, `ld`=lazydocker, `tree`=`eza --tree --icons=auto`,
-   `..`/`...`. Plus a `spf` **function** (not an alias) so superfile can cd-on-quit:
+   `..`/`...`, `codex`=`codex --yolo`. Plus a `spf` **function** (not an alias) so
+   superfile can cd-on-quit:
    ```zsh
    spf() {
      command spf "$@"
@@ -74,32 +131,35 @@ Build it with these blocks, in this order:
    ```
    superfile writes a `cd '/path'` line to that lastdir file on quit; source it (never
    capture with `$(...)` — the TUI escape sequences would garble the screen).
-8. **Project jumps**: `cdpath` covering my source roots (ask me for the layout — pattern
-   is `~/coding/src/work/...` and `~/coding/src/hobby/...`), plus one-word shell
-   functions for the repos I'm currently living in.
-9. **Tool inits**: nvm (brew-installed, sourced), `fzf --zsh` (guarded interactive-only),
-   `zoxide init zsh`, `starship init zsh`, `direnv hook zsh`.
+8. **Project jumps**: nothing in the shell — superfile Pins (`spf`, then cd-on-quit) plus
+   zoxide cover it. Deliberately no `cdpath` and no one-word per-repo functions; they
+   duplicated the pins and went stale every time a repo moved. Pins live in
+   `~/Library/Application Support/superfile/pinned.json`.
+9. **Tool inits**: `fzf --zsh` (guarded interactive-only), `zoxide init zsh`,
+   `starship init zsh`, then `eval "$(mise activate zsh)"` (hook mode — replaces the old
+   nvm sourcing and `direnv hook`; switches runtime versions on `cd`).
 10. **Secrets**: `[ -f ~/.zshrc.local ] && source ~/.zshrc.local`; create that file
     chmod 600. Ask me which env vars to put there — never write values into ~/.zshrc.
-11. **Plugins, order matters**: zsh-autosuggestions → zsh-syntax-highlighting (must be
-    near-last) → `eval "$(atuin init zsh --disable-ai)"` (ctrl-r + up arrow; the
-    `--disable-ai` flag matters — I don't want `?` hijacked). If there's existing shell
-    history, run `atuin import auto`.
+11. **Plugins, order matters**: `eval "$(atuin init zsh --disable-ai)"` (ctrl-r + up
+    arrow; the `--disable-ai` flag matters — I don't want `?` hijacked) → then
+    zsh-autosuggestions → zsh-syntax-highlighting **last**. atuin goes *before*
+    syntax-highlighting: that plugin only wraps widgets declared before it. If there's
+    existing shell history, run `atuin import auto`.
 
 ## 3. git (`~/.gitconfig`)
 
-- `core.ignorecase=false`, `core.pager=delta`.
-- **Identity guard**: global user = `No Name <none@local.invalid>` (deliberate — forces
-  per-directory identity). `includeIf "gitdir:..."` blocks for the work and hobby source
-  roots, each pointing at a `.gitconfig` inside that root with the real name/email.
-  Ask me for the emails at setup time; don't invent them.
-- Pretty one-line log format (yellow hash, dim green local date `%F %H:%M`, orange refs,
-  cyan subject, gray author) via `format.pretty` + `log.date=format-local`.
-- `pull.rebase=true`, `push.autoSetupRemote=true`, `init.defaultBranch=main`,
-  `merge.conflictStyle=zdiff3`, `diff.colorMoved=default`.
-- **delta**: navigate, line-numbers, `syntax-theme = Catppuccin Mocha`. Side-by-side goes
-  in a *feature*, not the main section — main-section values override features, which
-  breaks the lazygit opt-out:
+**Copy `.gitconfig` from this repo** — it is the source of truth for every machine
+(pager/delta, pretty log, pull.rebase, push.autoSetupRemote, defaultBranch, zdiff3,
+colorMoved, aliases `st/co/sw/br/cm/amend/lg`). The two things the file can't explain
+itself:
+
+- **Identity guard**: global user = `No Name <none@local.invalid>` is deliberate — it
+  forces per-directory identity, so a forgotten repo fails loudly instead of committing
+  under the wrong name. Real name/email live in `.gitconfig` files *inside* the work and
+  hobby source roots, pulled in by the `includeIf "gitdir:"` blocks. Ask me for the
+  emails at setup time; don't invent them, and don't set a global real identity.
+- **delta side-by-side lives in a *feature*, never in `[delta]`** — main-section values
+  override features, which silently breaks lazygit's single-column opt-out:
   ```ini
   [delta]
       features = wide-view
@@ -108,11 +168,6 @@ Build it with these blocks, in this order:
   [delta "lazygit"]
       side-by-side = false
   ```
-- Aliases: `st`=status -sb, `co`, `sw`, `br`, `cm`, `amend`=commit --amend --no-edit,
-  `lg`=log --graph --decorate --oneline --all.
-- `interactive.diffFilter = delta --color-only`.
-
-See .gitconfig file for details.
 
 ## 4. Ghostty (`~/.config/ghostty/config`)
 
@@ -165,7 +220,84 @@ sync. On top of the starter I keep a transparent background (`lua/plugins/transp
 — tokyonight `transparent = true`, transparent sidebars/floats) so the Ghostty
 opacity/blur shows through; the rest I customize in-repo per machine.
 
-## 9. Verification
+## 9. herdr (`~/.config/herdr/config.toml`)
+
+Install via `brew install herdr` (tap: `herdr`). It's a tmux-like terminal workspace
+manager for AI coding agents. No standalone tmux config on this machine — herdr is the
+terminal multiplexer. Keybindings:
+- `theme.name = "catppuccin"` (Mocha).
+- `keys.prefix = "ctrl+b"` (herdr's own default — `ctrl+a` would shadow zsh's
+  `beginning-of-line` and vim's number-increment, with no tmux habit to justify it).
+- `focus_pane_{left,down,up,right} = prefix+{h,j,k,l}` — vim-style pane focus (herdr's
+  default already, pinned explicitly so it survives upstream default changes).
+- `split_horizontal = prefix+minus`, `split_vertical = prefix+v` (default mnemonic —
+  herdr only documents minus/comma/ampersand/plus/backtick as named punctuation keys,
+  so pipe/bar isn't reliably bindable for a `|` split key).
+- `new_tab = prefix+c`.
+- `reload_config = prefix+shift+r` (plain `prefix+r` is already `resize_mode`).
+- `[[keys.command]]` popup: `prefix+alt+g` opens `lazygit` in an 80%x80% popup.
+- `ui.accent = "#89b4fa"` (Catppuccin Mocha blue) — same accent lazygit uses.
+
+After editing config.toml: `herdr config check` to validate, `herdr server
+reload-config` to apply without restarting the session.
+
+This is also the remote-access story: the `tailscale` formula puts this Mac on the tailnet
+(MagicDNS name `mac`), so I ssh in from the phone with no port-forwarding and
+`herdr session attach default` picks up the very session running on the desktop.
+
+## 10. pi coding agent (`~/.pi/agent/`)
+
+Install via `brew install pi-coding-agent` (cask/formula name, binary is `pi`). Multi-provider
+terminal coding agent — Claude Code stays the daily driver for Claude models; pi is for
+everything else (Codex, NVIDIA, and whatever gets added later).
+
+- **Theme**: `~/.pi/agent/themes/catppuccin-mocha.json`, set as `"theme"` in
+  `settings.json`. Full Mocha palette, **accent = blue `#89b4fa`** — same accent lazygit
+  and herdr use, kept consistent on purpose. Syntax colors follow the official Catppuccin
+  style guide (keywords=mauve, strings=green, functions=blue, numbers=peach, types=yellow).
+- **Packages** (`settings.json` → `packages`, npm unless noted):
+  - `pi-multi-account` — multi-account rotation/failover pools, managed via the `/subs`
+    and `/pool` TUI commands inside pi, not config files. Currently pinned to
+    `git:github.com/lfoscari/pi-multi-account@9366f48` (a fork commit): the npm release
+    crashes on load because `@earendil-works/pi-ai` ≥0.80.10 dropped the OAuth runtime
+    exports. Swap back to `npm:pi-multi-account` once upstream PR #4 is merged+published.
+  - `@narumitw/pi-plan-mode` — Codex-like read-only `/plan` mode before any file edit.
+  - `@narumitw/pi-starship` — native TOML statusline in starship's style.
+  - `pi-web-access` — web search/fetch (Exa MCP, zero-config, no API key needed).
+  - `@upstash/context7-pi` — Context7 docs lookup (`resolve-library-id`/`query-docs`),
+    same service as the Context7 MCP used elsewhere.
+  - `@tintinweb/pi-subagents` — Claude-Code-style sub-agents (parallel, in-process).
+  - `~/.vibe-island/pi-extension` — menu-bar status (pre-existing, unrelated to the above).
+- **Custom extension**: `~/.pi/agent/extensions/herdr-subagent-bridge.ts` — bridges
+  pi-subagents lifecycle events (start/complete/fail) to herdr, since subagents run
+  in-process (no separate PID/pane to hand herdr directly). Reports each subagent as a
+  tracked agent on the current pane (`herdr pane report-agent`) plus a toast
+  (`herdr notification show`). No-ops if herdr isn't running.
+
+### herdr integration
+
+```
+herdr integration install pi
+herdr integration install claude
+herdr integration install codex
+```
+Gives all three agent CLIs live state tracking in herdr's sidebar and pane borders.
+Plan mode gets its own popup, bound like the existing lazygit one:
+```toml
+[[keys.command]]
+key = "prefix+alt+p"
+type = "popup"
+command = "pi --plan"
+width = "80%"
+height = "80%"
+```
+
+## 11. Not in scope for this repo
+
+Don't recreate or track: IDE settings (they sync through their own accounts), anything
+holding a secret (see `~/.zshrc.local`), and per-project runtime pins.
+
+## 12. Verification
 
 - new Ghostty window: font/theme right, background is translucent+blurred (opacity 0.85),
   F12 quick terminal works
@@ -177,4 +309,10 @@ opacity/blur shows through; the rest I customize in-repo per machine.
   terminal: side-by-side
 - `git -C <work-repo> config user.email` returns the work identity; a repo outside the
   source roots returns `none@local.invalid`
-- `btop`, `fastfetch`, `bbrew` launch; `dotnet --list-sdks` and `node -v` resolve
+- `btop`, `fastfetch`, `bbrew` launch; `mise ls` lists node/go/rust/dotnet, and
+  `dotnet --list-sdks` (both 8 + 10 from mise's dotnet-root) and `node -v` resolve
+- `herdr config check` reports ok; inside herdr, `ctrl+b` then `h/j/k/l` moves focus
+  between panes and `ctrl+b alt+g` pops open lazygit; `ctrl+b alt+p` pops open pi in
+  Plan mode
+- `pi` launches with the Catppuccin Mocha theme (blue accent); `herdr integration status`
+  shows `pi`, `claude`, `codex` all `current`
